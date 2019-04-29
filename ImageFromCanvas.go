@@ -102,7 +102,7 @@ func ImageFromCanvas(manifestURL string, canvasURL string) (string, error) {
 	if err != nil || len(c.Images) <= 0 {
 		m, err := ReadManifest(manifestURL)
 		if err != nil {
-			return "", nil
+			return "", err
 		}
 		for _, canvas := range m.Sequences[0].Canvases {
 			if canvas.ID == canvasURL {
