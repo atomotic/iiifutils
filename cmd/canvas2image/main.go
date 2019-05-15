@@ -20,11 +20,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	image, err := iiifutils.ImageFromCanvas(*manifest, *canvas)
+	image, page, err := iiifutils.ImageFromCanvas(*manifest, *canvas)
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Printf("%s/full/500,/0/default.jpg\n", image)
+		fmt.Printf("%d - %s/full/500,/0/default.jpg\n", page, image)
 	}
 
 }

@@ -59,60 +59,20 @@ func ReadManifest(manifest string) (*Manifest, error) {
 	return &m, nil
 }
 
-func ReadCanvas(canvas string) (*Canvas, error) {
-	var b []byte
-
-	b, err := cache.Read(hash(canvas))
-
-	if err != nil {
-		resp, err := http.Get(canvas)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 404 {
-			b, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			cache.Write(hash(canvas), b)
-		} else {
-			return nil, errors.New("404 canvas")
-		}
-
-	}
-
-	var c Canvas
-	err = json.Unmarshal(b, &c)
-	if err != nil {
-		return nil, err
-	}
-
-	return &c, nil
-}
-
-func ImageFromCanvas(manifestURL string, canvasURL string) (string, error) {
+func ImageFromCanvas(manifestURL string, canvasURL string) (string, int, error) {
 	var image string
+	var page int
 
-	c, err := ReadCanvas(canvasURL)
-
-	// if errors in reading Canvas (uri not resolvable) or if Images[] empty
-	// then read the whole manifest
-	if err != nil || len(c.Images) <= 0 {
-		m, err := ReadManifest(manifestURL)
-		if err != nil {
-			return "", err
+	m, err := ReadManifest(manifestURL)
+	if err != nil {
+		return "", 0, err
+	}
+	for sequence, canvas := range m.Sequences[0].Canvases {
+		if canvas.ID == canvasURL {
+			image = canvas.Images[0].Resource.Service.ID
+			page = sequence + 1
 		}
-		for _, canvas := range m.Sequences[0].Canvases {
-			if canvas.ID == canvasURL {
-				image = canvas.Images[0].Resource.Service.ID
-
-			}
-		}
-	} else {
-		image = c.Images[0].Resource.ID
 	}
 
-	return image, nil
+	return image, page, nil
 }

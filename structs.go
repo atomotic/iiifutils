@@ -17,7 +17,7 @@ type Manifest struct {
 	Sequences []struct {
 		Canvases []Canvas `json:"canvases"`
 		ID       string   `json:"@id"`
-		Label    string   `json:"label"`
-		Type     string   `json:"@type"`
+		// Label    string   `json:"label"` // Label could be a multilang field. not always a string
+		Type string `json:"@type"`
 	} `json:"sequences"`
 }
